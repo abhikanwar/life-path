@@ -2,6 +2,8 @@ import { upload } from "https://esm.sh/@vercel/blob/client";
 
 const form = document.getElementById("memory-form");
 const statusEl = document.getElementById("form-status");
+const mediaInput = document.getElementById("media-input");
+const fileNameEl = document.getElementById("media-file-name");
 
 function setStatus(message, type = "info") {
   if (!statusEl) return;
@@ -21,6 +23,20 @@ async function parseJsonSafely(response) {
 
 function getMediaKind(file) {
   return file.type.startsWith("video/") ? "video" : "image";
+}
+
+function prettySize(bytes) {
+  const mb = bytes / (1024 * 1024);
+  if (mb >= 1) return `${mb.toFixed(1)} MB`;
+  const kb = bytes / 1024;
+  return `${Math.max(1, Math.round(kb))} KB`;
+}
+
+if (mediaInput && fileNameEl) {
+  mediaInput.addEventListener("change", () => {
+    const file = mediaInput.files && mediaInput.files[0];
+    fileNameEl.textContent = file ? `${file.name} (${prettySize(file.size)})` : "No file chosen";
+  });
 }
 
 if (form) {

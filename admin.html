@@ -15,22 +15,31 @@
   <body class="admin-body">
     <main class="admin-shell">
       <section class="admin-card">
-        <p class="admin-kicker">Backend Form</p>
-        <h1>Add a New Memory</h1>
-        <p class="admin-copy">
-          Fill in title, main line, hidden text, memory caption, and upload photo/video.
-        </p>
+        <header class="admin-head">
+          <p class="admin-kicker">Memory Studio</p>
+          <h1>Add a New Diva</h1>
+          <p class="admin-copy">
+            Upload a photo/video, write the line users will see, and add the hidden reveal text.
+          </p>
+        </header>
 
         <form id="memory-form" class="memory-form" novalidate>
-          <label class="field">
+          <label class="field field-passcode">
             <span>Admin passcode</span>
             <input name="passcode" type="password" autocomplete="current-password" required />
           </label>
 
-          <label class="field">
-            <span>Title</span>
-            <input name="title" type="text" maxlength="80" required />
-          </label>
+          <div class="field-grid">
+            <label class="field">
+              <span>Title</span>
+              <input name="title" type="text" maxlength="80" required />
+            </label>
+
+            <label class="field">
+              <span>Memory (caption)</span>
+              <input name="memory" type="text" maxlength="120" />
+            </label>
+          </div>
 
           <label class="field">
             <span>Main line</span>
@@ -38,25 +47,34 @@
           </label>
 
           <label class="field">
-            <span>Hidden</span>
+            <span>Hidden reveal line</span>
             <textarea name="hidden" rows="3" maxlength="320" required></textarea>
           </label>
 
-          <label class="field">
-            <span>Memory (caption)</span>
-            <input name="memory" type="text" maxlength="120" />
-          </label>
-
-          <label class="field">
+          <div class="field">
             <span>Pic / video</span>
-            <input name="media" type="file" accept="image/*,video/*" required />
-          </label>
+            <div class="file-picker">
+              <input
+                id="media-input"
+                class="file-input-native"
+                name="media"
+                type="file"
+                accept="image/*,video/*"
+                required
+              />
+              <label class="file-input-btn" for="media-input">Choose file</label>
+              <span id="media-file-name" class="file-input-name">No file chosen</span>
+            </div>
+            <small class="field-hint">Accepted: JPG, PNG, WEBP, GIF, MP4, MOV, WEBM (max 100MB)</small>
+          </div>
 
-          <button type="submit" class="admin-submit">Save Memory</button>
+          <button type="submit" class="admin-submit">Upload Memory</button>
           <p id="form-status" class="form-status" aria-live="polite"></p>
         </form>
 
-        <a class="admin-home-link" href="/">← Back to home</a>
+        <footer class="admin-foot">
+          <a class="admin-home-link" href="/">← Back to Diva</a>
+        </footer>
       </section>
     </main>
 
