@@ -6,7 +6,12 @@
  *   revealText,
  *   mediaType,
  *   mediaSrc,
- *   mediaAlt
+ *   mediaAlt,
+ *   caption?,
+ *   sticker?,
+ *   grade?,
+ *   focus?,
+ *   overlay?
  * }
  * Favorite: { id, label, detail }
  * Scenario: { id, title, description }
@@ -16,7 +21,7 @@ const content = {
   intro:
     "Hi, this is purely for entertainment and to celebrate my existence. No animals were harmed in the making of this page.",
   closingMessage:
-    "She makes ordinary days feel soft, silly, and full of color. The world is better with her in it.",
+    "If you have made it to the end you're clearly unemployed. Get a life bro!",
   chapters: [
     {
       id: "cake-origin-story",
@@ -280,11 +285,17 @@ function renderTimeline() {
   const cards = content.chapters
     .map((chapter, idx) => {
       const toneClass = idx % 2 === 0 ? "is-peach" : "is-sage";
+      const depthClass = idx % 2 === 0 ? "depth-1" : "depth-2";
+      const sticker = chapter.sticker || ["heart", "sparkle", "flower", "star"][idx % 4];
+      const caption = chapter.caption || `${chapter.title} memory`;
+      const grade = chapter.grade || "warm";
+      const focus = chapter.focus || "center";
+      const overlay = chapter.overlay || "grain";
       const hasTrail = idx < content.chapters.length - 1;
       const mediaHtml =
         chapter.mediaType === "video"
           ? `<video
-                class="chapter-media"
+                class="polaroid-media focus-${focus} grade-${grade}"
                 autoplay
                 loop
                 muted
@@ -296,7 +307,7 @@ function renderTimeline() {
                 Your browser does not support the video tag.
               </video>`
           : `<img
-                class="chapter-media"
+                class="polaroid-media focus-${focus} grade-${grade}"
                 src="${chapter.mediaSrc}"
                 alt="${chapter.mediaAlt}"
                 loading="lazy"
@@ -304,12 +315,26 @@ function renderTimeline() {
       return `
         <div class="timeline-step">
           <article
-            class="chapter-card ${toneClass}"
+            class="chapter-card ${toneClass} ${depthClass}"
             data-animate-on-scroll
-            style="--enter-delay: ${idx * 90}ms"
+            style="--enter-delay: ${idx * 90}ms; --tilt: ${idx % 2 === 0 ? "-2deg" : "2deg"}"
           >
             <div class="chapter-head">
-              ${mediaHtml}
+              <div class="polaroid-frame">
+                <span class="tape-corner tape-left" aria-hidden="true"></span>
+                <span class="tape-corner tape-right" aria-hidden="true"></span>
+                <div class="media-shell overlay-${overlay}">
+                  ${mediaHtml}
+                  <span class="media-vignette" aria-hidden="true"></span>
+                  <span class="media-grain" aria-hidden="true"></span>
+                  <span class="media-glow" aria-hidden="true"></span>
+                </div>
+                <div class="polaroid-meta">
+                  <p class="polaroid-caption">${caption}</p>
+                  <span class="polaroid-stamp" aria-hidden="true">with love</span>
+                </div>
+                <span class="sticker-badge sticker-${sticker}" aria-hidden="true"></span>
+              </div>
               <h3 class="chapter-title">${chapter.title}</h3>
             </div>
             <p class="chapter-blurb">${chapter.blurb}</p>
@@ -342,6 +367,10 @@ function renderTimeline() {
                       class="trail-center"
                       d="M60 0 C20 48,100 90,60 140 C22 176,96 198,60 220"
                     />
+                    <path
+                      class="trail-sketch"
+                      d="M60 0 C20 48,100 90,60 140 C22 176,96 198,60 220"
+                    />
                   </svg>
                 </div>`
               : ""
@@ -352,6 +381,38 @@ function renderTimeline() {
     .join("");
 
   timelineEl.innerHTML = cards;
+}
+
+function setupPremiumReadyState() {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      document.body.classList.add("is-premium-ready");
+    });
+  });
+}
+
+function setupStickerParallax() {
+  const stickers = document.querySelectorAll("[data-parallax]");
+  if (!stickers.length) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  let ticking = false;
+  const update = () => {
+    const scrollY = window.scrollY;
+    stickers.forEach((el) => {
+      const speed = Number.parseFloat(el.style.getPropertyValue("--parallax-speed")) || 0.08;
+      const y = Math.round(scrollY * speed);
+      el.style.transform = `translate3d(0, ${y}px, 0)`;
+    });
+    ticking = false;
+  };
+
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      window.requestAnimationFrame(update);
+      ticking = true;
+    }
+  });
 }
 
 function renderFavorites() {
@@ -495,7 +556,9 @@ function init() {
   setupRevealToggles();
   setupScrollAnimations();
   setupRoadTrailAnimation();
+  setupStickerParallax();
   setupReplayButton();
+  setupPremiumReadyState();
 }
 
 init();

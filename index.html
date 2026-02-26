@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Nunito:wght@400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Caveat:wght@600;700&family=Nunito:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="styles.css" />
@@ -15,6 +15,9 @@
   <body>
     <main class="page-shell">
       <section class="hero panel" data-animate-on-scroll>
+        <span class="hero-sticker sticker-heart" aria-hidden="true" data-parallax style="--parallax-speed: 0.08">❤</span>
+        <span class="hero-sticker sticker-star" aria-hidden="true" data-parallax style="--parallax-speed: 0.12">✦</span>
+        <span class="hero-sticker sticker-flower" aria-hidden="true" data-parallax style="--parallax-speed: 0.1">✿</span>
         <p class="eyebrow">A tiny tour of Babygirl</p>
         <h1>Get to Know <span id="her-name">Her Name</span></h1>
         <p class="hero-copy">
@@ -22,6 +25,7 @@
           little things that make her unforgettable.
         </p>
         <p class="scroll-cue" aria-hidden="true">Start scrolling ↓</p>
+        <p class="journey-tag" aria-hidden="true">journey starts here</p>
       </section>
 
       <section class="panel timeline-wrap" aria-labelledby="timeline-heading">
@@ -42,16 +46,17 @@
         <div id="scenarios" class="scenario-grid"></div>
       </section> -->
 
-      <!-- <section class="panel closing" data-animate-on-scroll>
-        <h2>Why She Is So Special</h2>
+      <section class="panel closing ending-panel" data-animate-on-scroll>
+        <p class="ending-kicker">Final Note</p>
+        <h2></h2>
+        <p class="ending-subline"></p>
         <p id="closing-message">
-          She makes ordinary days feel soft, silly, and full of color. The
-          world is better with her in it.
+          cringe not intended
         </p>
         <button id="replay-btn" class="replay-btn" type="button">
           Replay journey
         </button>
-      </section> -->
+      </section>
     </main>
     <script src="script.js" defer></script>
   </body>
