@@ -1,5 +1,4 @@
 const CONTENT_PREFIX = "couple/content-";
-const UPLOAD_PREFIX = "couple/uploads";
 
 function getBlobClient() {
   try {
@@ -23,32 +22,6 @@ function sanitizeText(value, maxLen = 280) {
     .replace(/[<>]/g, "")
     .trim()
     .slice(0, maxLen);
-}
-
-function parseDataUrl(dataUrl) {
-  const match = String(dataUrl || "").match(/^data:([^;]+);base64,(.+)$/);
-  if (!match) {
-    throw new Error("Invalid image data. Please choose a valid image file.");
-  }
-
-  const mimeType = match[1];
-  const base64Payload = match[2];
-  const buffer = Buffer.from(base64Payload, "base64");
-
-  return {
-    mimeType,
-    buffer,
-  };
-}
-
-function extensionFromMime(mimeType) {
-  const [type, subtypeRaw] = String(mimeType).split("/");
-  const subtype = String(subtypeRaw || "bin").toLowerCase();
-  if (subtype.includes("jpeg")) return "jpg";
-  if (subtype.includes("quicktime")) return "mov";
-  if (subtype.includes("x-matroska")) return "mkv";
-  if (!type) return "bin";
-  return subtype.replace(/[^a-z0-9]/g, "") || "bin";
 }
 
 async function readLatestContent() {
@@ -88,29 +61,24 @@ async function writeContentSnapshot(content) {
 }
 
 async function appendChapter(input) {
-  const { put } = getBlobClient();
-
   const title = sanitizeText(input.title, 80);
   const blurb = sanitizeText(input.mainLine, 240);
   const revealText = sanitizeText(input.hidden, 320);
   const caption = sanitizeText(input.memory, 120);
+  const mediaUrl = String(input.mediaUrl || "").trim();
+  const mediaMimeType = String(input.mediaMimeType || "").toLowerCase();
 
-  if (!title || !blurb || !revealText || !input.imageDataUrl) {
+  if (!title || !blurb || !revealText || !mediaUrl) {
     throw new Error("Missing required fields. Please fill title, main line, hidden text, and photo.");
   }
 
-  const { mimeType, buffer } = parseDataUrl(input.imageDataUrl);
-  const mediaType = mimeType.startsWith("video/") ? "video" : "image";
-  const ext = extensionFromMime(mimeType);
+  if (!mediaUrl.startsWith("https://")) {
+    throw new Error("Invalid uploaded media URL.");
+  }
+
+  const mediaType = mediaMimeType.startsWith("video/") ? "video" : "image";
   const baseSlug = slugify(title);
   const stamp = Date.now();
-  const mediaPath = `${UPLOAD_PREFIX}/${stamp}-${baseSlug}.${ext}`;
-
-  const upload = await put(mediaPath, buffer, {
-    access: "public",
-    addRandomSuffix: false,
-    contentType: mimeType,
-  });
 
   const chapter = {
     id: `${baseSlug}-${stamp}`,
@@ -118,7 +86,7 @@ async function appendChapter(input) {
     blurb,
     revealText,
     mediaType,
-    mediaSrc: upload.url,
+    mediaSrc: mediaUrl,
     mediaAlt: `${title} memory`,
     caption: caption || `${title} memory`,
   };

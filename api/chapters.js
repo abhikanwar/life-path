@@ -16,14 +16,15 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { title, memory, mainLine, hidden, imageDataUrl } = req.body || {};
+    const { title, memory, mainLine, hidden, mediaUrl, mediaMimeType } = req.body || {};
 
     const { chapter, updated } = await appendChapter({
       title,
       memory,
       mainLine,
       hidden,
-      imageDataUrl,
+      mediaUrl,
+      mediaMimeType,
     });
 
     return res.status(201).json({

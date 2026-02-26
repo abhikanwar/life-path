@@ -1,3 +1,5 @@
+import { upload } from "https://esm.sh/@vercel/blob/client";
+
 const form = document.getElementById("memory-form");
 const statusEl = document.getElementById("form-status");
 
@@ -7,13 +9,18 @@ function setStatus(message, type = "info") {
   statusEl.dataset.state = type;
 }
 
-function fileToDataUrl(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("Could not read file."));
-    reader.readAsDataURL(file);
-  });
+async function parseJsonSafely(response) {
+  const raw = await response.text();
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function getMediaKind(file) {
+  return file.type.startsWith("video/") ? "video" : "image";
 }
 
 if (form) {
@@ -35,16 +42,25 @@ if (form) {
       return;
     }
 
-    if (media.size > 8 * 1024 * 1024) {
-      setStatus("File too large. Keep it under 8 MB.", "error");
+    if (media.size > 100 * 1024 * 1024) {
+      setStatus("File too large. Keep it under 100 MB.", "error");
       return;
     }
 
     try {
       submitBtn.disabled = true;
-      setStatus("Uploading...", "info");
+      setStatus("Uploading media...", "info");
 
-      const imageDataUrl = await fileToDataUrl(media);
+      const blob = await upload(media.name, media, {
+        access: "public",
+        handleUploadUrl: "/api/upload",
+        clientPayload: JSON.stringify({
+          passcode,
+          mediaKind: getMediaKind(media),
+        }),
+      });
+
+      setStatus("Saving memory...", "info");
       const res = await fetch("/api/chapters", {
         method: "POST",
         headers: {
@@ -56,13 +72,20 @@ if (form) {
           mainLine,
           hidden,
           memory,
-          imageDataUrl,
+          mediaUrl: blob.url,
+          mediaMimeType: blob.contentType || media.type || "",
         }),
       });
 
-      const data = await res.json();
+      const data = await parseJsonSafely(res);
       if (!res.ok) {
-        throw new Error(data.error || "Upload failed");
+        if (res.status === 401) {
+          throw new Error("Invalid admin passcode.");
+        }
+        if (res.status === 500) {
+          throw new Error("Server error. Check ADMIN_PASSCODE and BLOB_READ_WRITE_TOKEN on Vercel.");
+        }
+        throw new Error((data && data.error) || `Save failed (HTTP ${res.status}).`);
       }
 
       form.reset();
