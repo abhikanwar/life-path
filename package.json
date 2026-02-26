@@ -1,0 +1,25 @@
+{
+  "name": "couple",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhikanwar/life-path.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@vercel/blob": "^1.1.1"
+  },
+  "bugs": {
+    "url": "https://github.com/abhikanwar/life-path/issues"
+  },
+  "homepage": "https://github.com/abhikanwar/life-path#readme"
+}

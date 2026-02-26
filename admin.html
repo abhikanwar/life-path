@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Memory</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Caveat:wght@600;700&family=Nunito:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="admin-body">
+    <main class="admin-shell">
+      <section class="admin-card">
+        <p class="admin-kicker">Backend Form</p>
+        <h1>Add a New Memory</h1>
+        <p class="admin-copy">
+          Fill in title, main line, hidden text, memory caption, and upload photo/video.
+        </p>
+
+        <form id="memory-form" class="memory-form" novalidate>
+          <label class="field">
+            <span>Admin passcode</span>
+            <input name="passcode" type="password" autocomplete="current-password" required />
+          </label>
+
+          <label class="field">
+            <span>Title</span>
+            <input name="title" type="text" maxlength="80" required />
+          </label>
+
+          <label class="field">
+            <span>Main line</span>
+            <textarea name="mainLine" rows="3" maxlength="240" required></textarea>
+          </label>
+
+          <label class="field">
+            <span>Hidden</span>
+            <textarea name="hidden" rows="3" maxlength="320" required></textarea>
+          </label>
+
+          <label class="field">
+            <span>Memory (caption)</span>
+            <input name="memory" type="text" maxlength="120" />
+          </label>
+
+          <label class="field">
+            <span>Pic / video</span>
+            <input name="media" type="file" accept="image/*,video/*" required />
+          </label>
+
+          <button type="submit" class="admin-submit">Save Memory</button>
+          <p id="form-status" class="form-status" aria-live="polite"></p>
+        </form>
+
+        <a class="admin-home-link" href="/">← Back to home</a>
+      </section>
+    </main>
+
+    <script src="admin.js" defer></script>
+  </body>
+</html>

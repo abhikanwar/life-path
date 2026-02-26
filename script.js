@@ -16,7 +16,7 @@
  * Favorite: { id, label, detail }
  * Scenario: { id, title, description }
  */
-const content = {
+const fallbackContent = {
   herName: "Diva",
   intro:
     "Hi, this is purely for entertainment and to celebrate my existence. No animals were harmed in the making of this page.",
@@ -259,6 +259,8 @@ const content = {
   ],
 };
 
+let content = JSON.parse(JSON.stringify(fallbackContent));
+
 const timelineEl = document.getElementById("timeline");
 const favoritesEl = document.getElementById("favorites");
 const scenariosEl = document.getElementById("scenarios");
@@ -267,16 +269,18 @@ const replayBtn = document.getElementById("replay-btn");
 const heroCopy = document.querySelector(".hero-copy");
 const closingMessageEl = document.getElementById("closing-message");
 
-if (nameEl) {
-  nameEl.textContent = content.herName;
-}
+function renderTopCopy() {
+  if (nameEl) {
+    nameEl.textContent = content.herName;
+  }
 
-if (heroCopy) {
-  heroCopy.textContent = content.intro;
-}
+  if (heroCopy) {
+    heroCopy.textContent = content.intro;
+  }
 
-if (closingMessageEl) {
-  closingMessageEl.textContent = content.closingMessage;
+  if (closingMessageEl) {
+    closingMessageEl.textContent = content.closingMessage;
+  }
 }
 
 function renderTimeline() {
@@ -549,7 +553,39 @@ function setupReplayButton() {
   });
 }
 
-function init() {
+function mergeContentData(data) {
+  if (!data || typeof data !== "object") return;
+
+  content = {
+    ...fallbackContent,
+    ...data,
+    chapters: Array.isArray(data.chapters)
+      ? [...fallbackContent.chapters, ...data.chapters]
+      : fallbackContent.chapters,
+    favorites: Array.isArray(data.favorites) ? data.favorites : fallbackContent.favorites,
+    scenarios: Array.isArray(data.scenarios) ? data.scenarios : fallbackContent.scenarios,
+  };
+}
+
+async function loadContentFromBackend() {
+  try {
+    const res = await fetch("/api/content", {
+      cache: "no-store",
+    });
+    if (!res.ok) return;
+
+    const data = await res.json();
+    if (data && data.content) {
+      mergeContentData(data.content);
+    }
+  } catch (err) {
+    console.warn("Could not load backend content, using fallback content.", err);
+  }
+}
+
+async function init() {
+  await loadContentFromBackend();
+  renderTopCopy();
   renderTimeline();
   renderFavorites();
   renderScenarios();
